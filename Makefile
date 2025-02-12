@@ -22,3 +22,7 @@ generate_table: clean
 var_2: clean
 	$(CC) $(WWW) var_2.c
 	./a.out
+
+origin_test: clean
+	$(CC) $(WWW) origin_test.c
+	./a.out

@@ -38,7 +38,7 @@ static unsigned short CRC16_TAB[256] = {
 unsigned short calc_crc16(unsigned char *data, int length) {
     unsigned short crc = 0;
     for (int i = 0; i < length; i++) {
-        crc = (crc >> 8) ^ CRC16_TAB[(crc ^ data[i]) & 0xFF];
+        if (i != 20 && i != 21) crc = (crc >> 8) ^ CRC16_TAB[(crc ^ data[i]) & 0xFF];
     }
     return crc;
 }
@@ -49,8 +49,11 @@ void decode_packet(unsigned char *packet, int length) {
         return;
     }
     
-    unsigned short received_crc = (packet[21] << 8) | packet[22];
-    unsigned short calculated_crc = calc_crc16(packet, 21);
+    unsigned short received_crc = (packet[20] << 8) | packet[21];
+    unsigned short calculated_crc = calc_crc16(packet, 24);
+
+    printf("\nreceived_crc = %d            %x         %X\n", received_crc, received_crc, received_crc);
+    printf("calculated_crc = %d            %x         %X\n\n", calculated_crc, calculated_crc, calculated_crc);
     
     if (received_crc != calculated_crc) {
         printf("CRC check failed\n");
@@ -81,6 +84,5 @@ int main() {
     unsigned char packet[] = {0x80, 0x06, 0x02, 0x03, 0x0b, 0xf8, 0x03, 0xdc, 0x03, 0x7f, 0x15, 0x8e, 0x03, 0x57, 0x17, 0x3f, 0x0b, 0x04, 0x05, 0xb9, 0xf1, 0xb2, 0x06, 0x04};
     decode_packet(packet, sizeof(packet));
 
-    printf(" sizeof CRC16_TAB = %ld\n", sizeof(CRC16_TAB[0]));
     return 0;
 }
